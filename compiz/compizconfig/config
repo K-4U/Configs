@@ -1,0 +1,7 @@
+[gnome_session]
+profile = 
+
+[general]
+profile = 
+integration = true
+
