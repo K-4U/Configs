@@ -1361,30 +1361,6 @@ PS3='?# '
 # the execution trace prompt (setopt xtrace). default: '+%N:%i>'
 PS4='+%N:%i:%_> '
 
-# set variable debian_chroot if running in a chroot with /etc/debian_chroot
-if [[ -z "$debian_chroot" ]] && [[ -r /etc/debian_chroot ]] ; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# don't use colors on dumb terminals (like emacs):
-if [[ "$TERM" == dumb ]] ; then
-    PROMPT="${EXITCODE}${debian_chroot:+($debian_chroot)}%n@%m %40<...<%B%~%b%<< "
-else
-    # only if $GRMLPROMPT is set (e.g. via 'GRMLPROMPT=1 zsh') use the extended
-    # prompt set variable identifying the chroot you work in (used in the
-    # prompt below)
-    if [[ $GRMLPROMPT -gt 0 ]] ; then
-        PROMPT="${RED}${EXITCODE}${CYAN}[%j running job(s)] ${GREEN}{history#%!} ${RED}%(3L.+.) ${BLUE}%* %D
-${BLUE}%n${NO_COLOUR}@%m %40<...<%B%~%b%<< "
-    else
-        # This assembles the primary prompt string
-        if (( EUID != 0 )); then
-            PROMPT="${RED}${EXITCODE}${WHITE}${debian_chroot:+($debian_chroot)}${BLUE}%n${NO_COLOUR}@%m %40<...<%B%~%b%<< "
-        else
-            PROMPT="${BLUE}${EXITCODE}${WHITE}${debian_chroot:+($debian_chroot)}${RED}%n${NO_COLOUR}@%m %40<...<%B%~%b%<< "
-        fi
-    fi
-fi
 
 PROMPT="${PROMPT}"'${vcs_info_msg_0_}'"%# "
 
@@ -1395,7 +1371,6 @@ fi
 
 # 'hash' some often used directories
 #d# start
-hash -d deb=/var/cache/apt/archives
 hash -d doc=/usr/share/doc
 hash -d linux=/lib/modules/$(command uname -r)/build/
 hash -d log=/var/log
@@ -1403,7 +1378,7 @@ hash -d slog=/var/log/syslog
 hash -d src=/usr/src
 hash -d templ=/usr/share/doc/grml-templates
 hash -d tt=/usr/share/doc/texttools-doc
-hash -d www=/var/www
+hash -d www=/src/http/
 #d# end
 
 # some aliases
@@ -1482,116 +1457,6 @@ if ! check_com asc &>/dev/null ; then
   asc() { autossh -t "$@" 'screen -RdU' }
   compdef asc=ssh
 fi
-
-#f1# Hints for the use of zsh on grml
-zsh-help() {
-    print "$bg[white]$fg[black]
-zsh-help - hints for use of zsh on grml
-=======================================$reset_color"
-
-    print '
-Main configuration of zsh happens in /etc/zsh/zshrc.
-That file is part of the package grml-etc-core, if you want to
-use them on a non-grml-system just get the tar.gz from
-http://deb.grml.org/ or (preferably) get it from the git repository:
-
-  http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
-
-This version of grml'\''s zsh setup does not use skel/.zshrc anymore.
-The file is still there, but it is empty for backwards compatibility.
-
-For your own changes use these two files:
-    $HOME/.zshrc.pre
-    $HOME/.zshrc.local
-
-The former is sourced very early in our zshrc, the latter is sourced
-very lately.
-
-System wide configuration without touching configuration files of grml
-can take place in /etc/zsh/zshrc.local.
-
-For information regarding zsh start at http://grml.org/zsh/
-
-Take a look at grml'\''s zsh refcard:
-% xpdf =(zcat /usr/share/doc/grml-docs/zsh/grml-zsh-refcard.pdf.gz)
-
-Check out the main zsh refcard:
-% '$BROWSER' http://www.bash2zsh.com/zsh_refcard/refcard.pdf
-
-And of course visit the zsh-lovers:
-% man zsh-lovers
-
-You can adjust some options through environment variables when
-invoking zsh without having to edit configuration files.
-Basically meant for bash users who are not used to the power of
-the zsh yet. :)
-
-  "NOCOR=1    zsh" => deactivate automatic correction
-  "NOMENU=1   zsh" => do not use auto menu completion
-                      (note: use ctrl-d for completion instead!)
-  "NOPRECMD=1 zsh" => disable the precmd + preexec commands (set GNU screen title)
-  "NOTITLE=1  zsh" => disable setting the title of xterms without disabling
-                      preexec() and precmd() completely
-  "BATTERY=1  zsh" => activate battery status (via acpi) on right side of prompt
-  "COMMAND_NOT_FOUND=1 zsh"
-                   => Enable a handler if an external command was not found
-                      The command called in the handler can be altered by setting
-                      the GRML_ZSH_CNF_HANDLER variable, the default is:
-                      "/usr/share/command-not-found/command-not-found"
-
-A value greater than 0 is enables a feature; a value equal to zero
-disables it. If you like one or the other of these settings, you can
-add them to ~/.zshrc.pre to ensure they are set when sourcing grml'\''s
-zshrc.'
-
-    print "
-$bg[white]$fg[black]
-Please report wishes + bugs to the grml-team: http://grml.org/bugs/
-Enjoy your grml system with the zsh!$reset_color"
-}
-
-# debian stuff
-if [[ -r /etc/debian_version ]] ; then
-    #a3# Execute \kbd{apt-cache search}
-    alias acs='apt-cache search'
-    #a3# Execute \kbd{apt-cache show}
-    alias acsh='apt-cache show'
-    #a3# Execute \kbd{apt-cache policy}
-    alias acp='apt-cache policy'
-    #a3# Execute \kbd{apt-get dist-upgrade}
-    salias adg="apt-get dist-upgrade"
-    #a3# Execute \kbd{apt-get install}
-    salias agi="apt-get install"
-    #a3# Execute \kbd{aptitude install}
-    salias ati="aptitude install"
-    #a3# Execute \kbd{apt-get upgrade}
-    salias ag="apt-get upgrade"
-    #a3# Execute \kbd{apt-get update}
-    salias au="apt-get update"
-    #a3# Execute \kbd{aptitude update ; aptitude safe-upgrade}
-    salias -a up="aptitude update ; aptitude safe-upgrade"
-    #a3# Execute \kbd{dpkg-buildpackage}
-    alias dbp='dpkg-buildpackage'
-    #a3# Execute \kbd{grep-excuses}
-    alias ge='grep-excuses'
-
-    # get a root shell as normal user in live-cd mode:
-    if isgrmlcd && [[ $UID -ne 0 ]] ; then
-       alias su="sudo su"
-     fi
-
-    #a1# Take a look at the syslog: \kbd{\$PAGER /var/log/syslog}
-    salias llog="$PAGER /var/log/syslog"     # take a look at the syslog
-    #a1# Take a look at the syslog: \kbd{tail -f /var/log/syslog}
-    salias tlog="tail -f /var/log/syslog"    # follow the syslog
-fi
-
-# sort installed Debian-packages by size
-if check_com -c dpkg-query ; then
-    #a3# List installed Debian-packages sorted by size
-    alias debs-by-size="dpkg-query -Wf 'x \${Installed-Size} \${Package} \${Status}\n' | sed -ne '/^x  /d' -e '/^x \(.*\) install ok installed$/s//\1/p' | sort -nr"
-fi
-
 # if cdrecord is a symlink (to wodim) or isn't present at all warn:
 if [[ -L /usr/bin/cdrecord ]] || ! check_com -c cdrecord; then
     if check_com -c wodim; then
@@ -1838,65 +1703,6 @@ sll() {
     done
 }
 
-# TODO: Is it supported to use pager settings like this?
-#   PAGER='less -Mr' - If so, the use of $PAGER here needs fixing
-# with respect to wordsplitting. (ie. ${=PAGER})
-if check_com -c $PAGER ; then
-    #f1# View Debian's changelog of a given package
-    dchange() {
-        emulate -L zsh
-        if [[ -r /usr/share/doc/$1/changelog.Debian.gz ]] ; then
-            $PAGER /usr/share/doc/$1/changelog.Debian.gz
-        elif [[ -r /usr/share/doc/$1/changelog.gz ]] ; then
-            $PAGER /usr/share/doc/$1/changelog.gz
-        else
-            if check_com -c aptitude ; then
-                echo "No changelog for package $1 found, using aptitude to retrieve it."
-                if isgrml ; then
-                    aptitude -t unstable changelog $1
-                else
-                    aptitude changelog $1
-                fi
-            else
-                echo "No changelog for package $1 found, sorry."
-                return 1
-            fi
-        fi
-    }
-    _dchange() { _files -W /usr/share/doc -/ }
-    compdef _dchange dchange
-
-    #f1# View Debian's NEWS of a given package
-    dnews() {
-        emulate -L zsh
-        if [[ -r /usr/share/doc/$1/NEWS.Debian.gz ]] ; then
-            $PAGER /usr/share/doc/$1/NEWS.Debian.gz
-        else
-            if [[ -r /usr/share/doc/$1/NEWS.gz ]] ; then
-                $PAGER /usr/share/doc/$1/NEWS.gz
-            else
-                echo "No NEWS file for package $1 found, sorry."
-                return 1
-            fi
-        fi
-    }
-    _dnews() { _files -W /usr/share/doc -/ }
-    compdef _dnews dnews
-
-    #f1# View upstream's changelog of a given package
-    uchange() {
-        emulate -L zsh
-        if [[ -r /usr/share/doc/$1/changelog.gz ]] ; then
-            $PAGER /usr/share/doc/$1/changelog.gz
-        else
-            echo "No changelog for package $1 found, sorry."
-            return 1
-        fi
-    }
-    _uchange() { _files -W /usr/share/doc -/ }
-    compdef _uchange uchange
-fi
-
 # zsh profiling
 profile() {
     ZSH_PROFILE_RC=1 $SHELL "$@"
@@ -1913,50 +1719,6 @@ edfunc() {
     [[ -z "$1" ]] && { echo "Usage: edfunc <function_to_edit>" ; return 1 } || zed -f "$1" ;
 }
 compdef _functions edfunc
-
-# use it e.g. via 'Restart apache2'
-#m# f6 Start() \kbd{/etc/init.d/\em{process}}\quad\kbd{start}
-#m# f6 Restart() \kbd{/etc/init.d/\em{process}}\quad\kbd{restart}
-#m# f6 Stop() \kbd{/etc/init.d/\em{process}}\quad\kbd{stop}
-#m# f6 Reload() \kbd{/etc/init.d/\em{process}}\quad\kbd{reload}
-#m# f6 Force-Reload() \kbd{/etc/init.d/\em{process}}\quad\kbd{force-reload}
-#m# f6 Status() \kbd{/etc/init.d/\em{process}}\quad\kbd{status}
-if [[ -d /etc/init.d || -d /etc/service ]] ; then
-    __start_stop() {
-        local action_="${1:l}"  # e.g Start/Stop/Restart
-        local service_="$2"
-        local param_="$3"
-
-        local service_target_="$(readlink /etc/init.d/$service_)"
-        if [[ $service_target_ == "/usr/bin/sv" ]]; then
-            # runit
-            case "${action_}" in
-                start) if [[ ! -e /etc/service/$service_ ]]; then
-                           $SUDO ln -s "/etc/sv/$service_" "/etc/service/"
-                       else
-                           $SUDO "/etc/init.d/$service_" "${action_}" "$param_"
-                       fi ;;
-                # there is no reload in runits sysv emulation
-                reload) $SUDO "/etc/init.d/$service_" "force-reload" "$param_" ;;
-                *) $SUDO "/etc/init.d/$service_" "${action_}" "$param_" ;;
-            esac
-        else
-            # sysvinit
-            $SUDO "/etc/init.d/$service_" "${action_}" "$param_"
-        fi
-    }
-
-    _grmlinitd() {
-        local -a scripts
-        scripts=( /etc/init.d/*(x:t) )
-        _describe "service startup script" scripts
-    }
-
-    for i in Start Restart Stop Force-Reload Reload Status ; do
-        eval "$i() { __start_stop $i \"\$1\" \"\$2\" ; }"
-        compdef _grmlinitd $i
-    done
-fi
 
 #f1# Provides useful information on globbing
 H-Glob() {
@@ -2324,41 +2086,6 @@ cdt() {
     builtin cd "$t"
 }
 
-#f5# Create directory under cursor or the selected area
-# Press ctrl-xM to create the directory under the cursor or the selected area.
-# To select an area press ctrl-@ or ctrl-space and use the cursor.
-# Use case: you type "mv abc ~/testa/testb/testc/" and remember that the
-# directory does not exist yet -> press ctrl-XM and problem solved
-inplaceMkDirs() {
-    local PATHTOMKDIR
-    if ((REGION_ACTIVE==1)); then
-        local F=$MARK T=$CURSOR
-        if [[ $F -gt $T ]]; then
-            F=${CURSOR}
-            T=${MARK}
-        fi
-        # get marked area from buffer and eliminate whitespace
-        PATHTOMKDIR=${BUFFER[F+1,T]%%[[:space:]]##}
-        PATHTOMKDIR=${PATHTOMKDIR##[[:space:]]##}
-    else
-        local bufwords iword
-        bufwords=(${(z)LBUFFER})
-        iword=${#bufwords}
-        bufwords=(${(z)BUFFER})
-        PATHTOMKDIR="${(Q)bufwords[iword]}"
-    fi
-    [[ -z "${PATHTOMKDIR}" ]] && return 1
-    PATHTOMKDIR=${~PATHTOMKDIR}
-    if [[ -e "${PATHTOMKDIR}" ]]; then
-        zle -M " path already exists, doing nothing"
-    else
-        zle -M "$(mkdir -p -v "${PATHTOMKDIR}")"
-        zle end-of-line
-    fi
-}
-#k# mkdir -p <dir> from string under cursor or marked area
-zle -N inplaceMkDirs && bindkey '^xM' inplaceMkDirs
-
 #f5# List files which have been accessed within the last {\it n} days, {\it n} defaults to 1
 accessed() {
     emulate -L zsh
@@ -2382,32 +2109,6 @@ check_com new || alias new=modified
 # use colors when GNU grep with color-support
 #a2# Execute \kbd{grep -{}-color=auto}
 (( $#grep_options > 0 )) && alias grep='grep '${grep_options:+"${grep_options[*]}"}
-
-# Translate DE<=>EN
-# 'translate' looks up fot a word in a file with language-to-language
-# translations (field separator should be " : "). A typical wordlist looks
-# like at follows:
-#  | english-word : german-transmission
-# It's also only possible to translate english to german but not reciprocal.
-# Use the following oneliner to turn back the sort order:
-#  $ awk -F ':' '{ print $2" : "$1" "$3 }' \
-#    /usr/local/lib/words/en-de.ISO-8859-1.vok > ~/.translate/de-en.ISO-8859-1.vok
-#f5# Translates a word
-trans() {
-    emulate -L zsh
-    case "$1" in
-        -[dD]*)
-            translate -l de-en $2
-            ;;
-        -[eE]*)
-            translate -l en-de $2
-            ;;
-        *)
-            echo "Usage: $0 { -D | -E }"
-            echo "         -D == German to English"
-            echo "         -E == English to German"
-    esac
-}
 
 # Usage: simple-extract <file>
 # Using option -d deletes the original archive file.
@@ -2677,35 +2378,6 @@ whatwhen()  {
         ;;
     esac
 }
-
-# mercurial related stuff
-if check_com -c hg ; then
-    # gnu like diff for mercurial
-    # http://www.selenic.com/mercurial/wiki/index.cgi/TipsAndTricks
-    #f5# GNU like diff for mercurial
-    hgdi() {
-        emulate -L zsh
-        for i in $(hg status -marn "$@") ; diff -ubwd <(hg cat "$i") "$i"
-    }
-
-    # build debian package
-    #a2# Alias for \kbd{hg-buildpackage}
-    alias hbp='hg-buildpackage'
-
-    # execute commands on the versioned patch-queue from the current repos
-    alias mq='hg -R $(readlink -f $(hg root)/.hg/patches)'
-
-    # diffstat for specific version of a mercurial repository
-    #   hgstat      => display diffstat between last revision and tip
-    #   hgstat 1234 => display diffstat between revision 1234 and tip
-    #f5# Diffstat for specific version of a mercurial repos
-    hgstat() {
-        emulate -L zsh
-        [[ -n "$1" ]] && hg diff -r $1 -r tip | diffstat || hg export tip | diffstat
-    }
-
-fi # end of check whether we have the 'hg'-executable
-
 # grml-small cleanups
 
 # The following is used to remove zsh-config-items that do not work
