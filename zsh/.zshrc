@@ -411,6 +411,7 @@ alias egrep='egrep --colour=auto'
 alias ls='ls --color=auto --human-readable --group-directories-first --classify -a'
 alias ll='ls -l'
 alias la='ls -a'
+alias tmux='tmux -2'
 
 # # Keys.
 # case $TERM in
