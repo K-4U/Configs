@@ -409,6 +409,8 @@ fi
 alias grep='grep --colour=auto'
 alias egrep='egrep --colour=auto'
 alias ls='ls --color=auto --human-readable --group-directories-first --classify -a'
+alias ll='ls -l'
+alias la='ls -a'
 
 # # Keys.
 # case $TERM in
@@ -444,6 +446,193 @@ alias ls='ls --color=auto --human-readable --group-directories-first --classify 
 # 		bindkey "^[[3^" kill-word # control + delete
 # 	;;
 # esac
+
+
+# Usage: simple-extract <file>
+# Using option -d deletes the original archive file.
+#f5# Smart archive extractor
+simple-extract() {
+    emulate -L zsh
+    setopt extended_glob noclobber
+    local DELETE_ORIGINAL DECOMP_CMD USES_STDIN USES_STDOUT GZTARGET WGET_CMD
+    local RC=0
+    zparseopts -D -E "d=DELETE_ORIGINAL"
+    for ARCHIVE in "${@}"; do
+        case $ARCHIVE in
+            *.(tar.bz2|tbz2|tbz))
+                DECOMP_CMD="tar -xvjf -"
+                USES_STDIN=true
+                USES_STDOUT=false
+                ;;
+            *.(tar.gz|tgz))
+                DECOMP_CMD="tar -xvzf -"
+                USES_STDIN=true
+                USES_STDOUT=false
+                ;;
+            *.(tar.xz|txz|tar.lzma))
+                DECOMP_CMD="tar -xvJf -"
+                USES_STDIN=true
+                USES_STDOUT=false
+                ;;
+            *.tar)
+                DECOMP_CMD="tar -xvf -"
+                USES_STDIN=true
+                USES_STDOUT=false
+                ;;
+            *.rar)
+                DECOMP_CMD="unrar x"
+                USES_STDIN=false
+                USES_STDOUT=false
+                ;;
+            *.lzh)
+                DECOMP_CMD="lha x"
+                USES_STDIN=false
+                USES_STDOUT=false
+                ;;
+            *.7z)
+                DECOMP_CMD="7z x"
+                USES_STDIN=false
+                USES_STDOUT=false
+                ;;
+            *.(zip|jar))
+                DECOMP_CMD="unzip"
+                USES_STDIN=false
+                USES_STDOUT=false
+                ;;
+            *.deb)
+                DECOMP_CMD="ar -x"
+                USES_STDIN=false
+                USES_STDOUT=false
+                ;;
+            *.bz2)
+                DECOMP_CMD="bzip2 -d -c -"
+                USES_STDIN=true
+                USES_STDOUT=true
+                ;;
+            *.(gz|Z))
+                DECOMP_CMD="gzip -d -c -"
+                USES_STDIN=true
+                USES_STDOUT=true
+                ;;
+            *.(xz|lzma))
+                DECOMP_CMD="xz -d -c -"
+                USES_STDIN=true
+                USES_STDOUT=true
+                ;;
+            *)
+                print "ERROR: '$ARCHIVE' has unrecognized archive type." >&2
+                RC=$((RC+1))
+                continue
+                ;;
+        esac
+
+        if ! check_com ${DECOMP_CMD[(w)1]}; then
+            echo "ERROR: ${DECOMP_CMD[(w)1]} not installed." >&2
+            RC=$((RC+2))
+            continue
+        fi
+
+        GZTARGET="${ARCHIVE:t:r}"
+        if [[ -f $ARCHIVE ]] ; then
+
+            print "Extracting '$ARCHIVE' ..."
+            if $USES_STDIN; then
+                if $USES_STDOUT; then
+                    ${=DECOMP_CMD} < "$ARCHIVE" > $GZTARGET
+                else
+                    ${=DECOMP_CMD} < "$ARCHIVE"
+                fi
+            else
+                if $USES_STDOUT; then
+                    ${=DECOMP_CMD} "$ARCHIVE" > $GZTARGET
+                else
+                    ${=DECOMP_CMD} "$ARCHIVE"
+                fi
+            fi
+            [[ $? -eq 0 && -n "$DELETE_ORIGINAL" ]] && rm -f "$ARCHIVE"
+
+        elif [[ "$ARCHIVE" == (#s)(https|http|ftp)://* ]] ; then
+            if check_com curl; then
+                WGET_CMD="curl -L -k -s -o -"
+            elif check_com wget; then
+                WGET_CMD="wget -q -O - --no-check-certificate"
+            else
+                print "ERROR: neither wget nor curl is installed" >&2
+                RC=$((RC+4))
+                continue
+            fi
+            print "Downloading and Extracting '$ARCHIVE' ..."
+            if $USES_STDIN; then
+                if $USES_STDOUT; then
+                    ${=WGET_CMD} "$ARCHIVE" | ${=DECOMP_CMD} > $GZTARGET
+                    RC=$((RC+$?))
+                else
+                    ${=WGET_CMD} "$ARCHIVE" | ${=DECOMP_CMD}
+                    RC=$((RC+$?))
+                fi
+            else
+                if $USES_STDOUT; then
+                    ${=DECOMP_CMD} =(${=WGET_CMD} "$ARCHIVE") > $GZTARGET
+                else
+                    ${=DECOMP_CMD} =(${=WGET_CMD} "$ARCHIVE")
+                fi
+            fi
+
+        else
+            print "ERROR: '$ARCHIVE' is neither a valid file nor a supported URI." >&2
+            RC=$((RC+8))
+        fi
+    done
+    return $RC
+}
+
+#f5# cd to directoy and list files
+cl() {
+    emulate -L zsh
+    cd $1 && ls -a
+}
+
+#f5# Create Directoy and \kbd{cd} to it
+mkcd() {
+    if (( ARGC != 1 )); then
+        printf 'usage: mkcd <new-directory>\n'
+        return 1;
+    fi
+    if [[ ! -d "$1" ]]; then
+        command mkdir -p "$1"
+    else
+        printf '`%s'\'' already exists: cd-ing.\n' "$1"
+    fi
+    builtin cd "$1"
+}
+
+#f5# Create temporary directory and \kbd{cd} to it
+cdt() {
+    local t
+    t=$(mktemp -d)
+    echo "$t"
+    builtin cd "$t"
+}
+
+#f5# List files which have been accessed within the last {\it n} days, {\it n} defaults to 1
+accessed() {
+    emulate -L zsh
+    print -l -- *(a-${1:-1})
+}
+
+#f5# List files which have been changed within the last {\it n} days, {\it n} defaults to 1
+changed() {
+    emulate -L zsh
+    print -l -- *(c-${1:-1})
+}
+
+#f5# List files which have been modified within the last {\it n} days, {\it n} defaults to 1
+modified() {
+    emulate -L zsh
+    print -l -- *(m-${1:-1})
+}
+
+
 
 
 # keybindings
