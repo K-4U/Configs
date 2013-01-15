@@ -58,6 +58,11 @@ if [ -n "$1" ]; then
         HOME=$root_homedir
     elif [ "$1" == "remove" ]; then
         do_remove=true
+        if [ -n "$2" ]; then
+            HOME="/home/$2"
+            do_root=true
+        fi
+        echo " :: Removing all files from $HOME"
     else
         HOME="/home/$1"
         do_root=true

@@ -1,7 +1,3 @@
-# .zshrc
-# Author: Piotr Karbowski <piotr.karbowski@gmail.com>
-# License: beerware.
-
 # Basic zsh config.
 umask 077
 ZDOTDIR=${ZDOTDIR:-${HOME}}
