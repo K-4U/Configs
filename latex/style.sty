@@ -1,0 +1,139 @@
+\usepackage[a4paper]{geometry}
+\usepackage[dutch]{babel}
+\usepackage{fullpage}
+\usepackage{xr-hyper}
+
+\usepackage{wrapfig}
+ 
+\usepackage{bookmark}
+\hypersetup{pdfborder={0 0 0}}
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+\usepackage[Bjornstrup]{fncychap} 
+\usepackage{hyperref} 
+
+
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{minted}
+
+
+\usepackage{lastpage} 
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\headheight12pt
+\headsep12pt
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+
+\renewcommand{\chaptermark}[1]{%
+	\markboth{\bf \thechapter.\ #1}{}
+}
+
+
+
+\fancyhead[LE,RO]{\slshape \rightmark}
+\fancyhead[LO,RE]{\slshape \leftmark}
+
+\makeatletter
+\fancyfoot[RE, LO] {\@title\ - \@author \\ \@institute}
+\fancyfoot[RO, LE] {\thepage\ of \pageref{LastPage}}
+
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[RE, LO] {\@title\ - \@author \\ \@institute}
+\fancyfoot[RO, LE] {\thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}}
+
+\makeatother
+\renewcommand{\footrulewidth}{0.4pt} 
+
+
+\makeatletter
+\newcommand\education[1]{\renewcommand\@education{#1}}
+\def\@education{\@latex@error{No \noexpand\education given}\@ehc}
+
+\newcommand\studentNumber[1]{\renewcommand\@studentNumber{#1}}
+\def\@studentNumber{\@latex@error{No \noexpand\studentNumber given}\@ehc}
+
+\newcommand\institute[1]{\renewcommand\@institute{#1}}
+\def\@institute{\@latex@error{No \noexpand\institute given}\@ehc}
+
+\newcommand\eduYear[1]{\renewcommand\@eduYear{#1}}
+\def\@eduYear{\@latex@error{No \noexpand\eduYear given}\@ehc}
+
+\newcommand\tutor[1]{\renewcommand\@tutor{#1}}
+\def\@tutor{\@latex@error{No \noexpand\tutor given}\@ehc}
+
+\newcommand\location[1]{\renewcommand\@location{#1}}
+\def\@location{\@latex@error{No \noexpand\location given}\@ehc}
+
+\newcommand\course[1]{\renewcommand\@course{#1}}
+\def\@course{\@latex@error{No \noexpand\course given}\@ehc}
+\makeatother
+
+
+\makeatletter
+\def\maketitle{%
+	\begin{titlepage}
+	\pagenumbering{alph}
+  \null
+  \thispagestyle{empty}%
+  \vfill
+  \begin{center}\leavevmode
+    \normalfont
+    {\huge \@title\par}%
+    %\vskip 1cm
+    \vfil
+    {\Large \@author (\@studentNumber) \par}%
+    \vskip 1cm
+    \begin{tabular}{|l l|}
+    	\hline
+    	{\bf Document titel} & \@title \\ \hline
+    	{\bf Auteur} & \@author (\@studentNumber) \\ \hline
+    	{\bf Opleiding} & \@education \\ \hline
+    	{\bf School} & \@institute \\ \hline
+    	{\bf Leerjaar} & \@eduYear \\ \hline
+    	{\bf Beoordelend docent} & \@tutor \\ \hline
+    	{\bf Vakcode} & \@course \\ \hline
+    	{\bf Datum} & \@date \\ \hline
+    	{\bf Plaats} & \@location \\ \hline
+    \end{tabular}
+  \end{center}%
+  \vfill
+  \null
+  \end{titlepage}
+  \cleardoublepage\pagenumbering{arabic}
+  }
+\makeatother
+
+
+\makeatletter
+\renewcommand*{\@makechapterhead}[1]{%
+  \vspace*{5\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 040920
+        \DOCH
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 060424
+      \DOTI{#1}%
+    \else%
+      \DOTIS{#1}%
+    \fi
+  }}
+% For the case \chapter*:
+\renewcommand*{\@makeschapterhead}[1]{%
+  \vspace*{5\p@}%
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \DOTIS{#1}
+    \vskip 5\p@
+  }}
+\makeatother

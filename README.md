@@ -7,3 +7,4 @@ It contains:
 * Custom compiz fusion config
 * Custom tmux config
 * ZSH Config
+* Latex custom style
