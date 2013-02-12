@@ -328,7 +328,7 @@ fi
 if over_ssh && [ -z "${TMUX}" ]; then
 	prompt_is_ssh='%F{blue}[%F{red}SSH%F{blue}] '
 elif over_ssh; then
-	prompt_is_ssh='%F{blue}[%F{253}SSH%F{blue}] '
+	prompt_is_ssh='%F{blue}[%F{red}SSH%F{blue}] '
 else
 	unset prompt_is_ssh
 fi
@@ -467,9 +467,53 @@ source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
 # esac
 # 
 # 
-# Usage: simple-extract <file>
-# Using option -d deletes the original archive file.
-#f5# Smart archive extractor
+
+# utility functions
+# this function checks if a command exists and returns either true
+# or false. This avoids using 'which' and 'whence', which will
+# avoid problems with aliases for which on certain weird systems. :-)
+# Usage: check_com [-c|-g] word
+#   -c  only checks for external commands
+#   -g  does the usual tests and also checks for global aliases
+check_com() {
+    emulate -L zsh
+    local -i comonly gatoo
+
+    if [[ $1 == '-c' ]] ; then
+        (( comonly = 1 ))
+        shift
+    elif [[ $1 == '-g' ]] ; then
+        (( gatoo = 1 ))
+    else
+        (( comonly = 0 ))
+        (( gatoo = 0 ))
+    fi
+
+    if (( ${#argv} != 1 )) ; then
+        printf 'usage: check_com [-c] <command>\n' >&2
+        return 1
+    fi
+
+    if (( comonly > 0 )) ; then
+        [[ -n ${commands[$1]}  ]] && return 0
+        return 1
+    fi
+
+    if   [[ -n ${commands[$1]}    ]] \
+        || [[ -n ${functions[$1]}   ]] \
+        || [[ -n ${aliases[$1]}     ]] \
+        || [[ -n ${reswords[(r)$1]} ]] ; then
+
+        return 0
+    fi
+
+    if (( gatoo > 0 )) && [[ -n ${galiases[$1]} ]] ; then
+        return 0
+    fi
+
+    return 1
+}
+
 simple-extract() {
     emulate -L zsh
     setopt extended_glob noclobber
@@ -478,62 +522,62 @@ simple-extract() {
     zparseopts -D -E "d=DELETE_ORIGINAL"
     for ARCHIVE in "${@}"; do
         case $ARCHIVE in
-            *.(tar.bz2|tbz2|tbz))
+            *(tar.bz2|tbz2|tbz))
                 DECOMP_CMD="tar -xvjf -"
                 USES_STDIN=true
                 USES_STDOUT=false
                 ;;
-            *.(tar.gz|tgz))
+            *(tar.gz|tgz))
                 DECOMP_CMD="tar -xvzf -"
                 USES_STDIN=true
                 USES_STDOUT=false
                 ;;
-            *.(tar.xz|txz|tar.lzma))
+            *(tar.xz|txz|tar.lzma))
                 DECOMP_CMD="tar -xvJf -"
                 USES_STDIN=true
                 USES_STDOUT=false
                 ;;
-            *.tar)
+            *tar)
                 DECOMP_CMD="tar -xvf -"
                 USES_STDIN=true
                 USES_STDOUT=false
                 ;;
-            *.rar)
+            *rar)
                 DECOMP_CMD="unrar x"
                 USES_STDIN=false
                 USES_STDOUT=false
                 ;;
-            *.lzh)
+            *lzh)
                 DECOMP_CMD="lha x"
                 USES_STDIN=false
                 USES_STDOUT=false
                 ;;
-            *.7z)
+            *7z)
                 DECOMP_CMD="7z x"
                 USES_STDIN=false
                 USES_STDOUT=false
                 ;;
-            *.(zip|jar))
+            *(zip|jar))
                 DECOMP_CMD="unzip"
                 USES_STDIN=false
                 USES_STDOUT=false
                 ;;
-            *.deb)
+            *deb)
                 DECOMP_CMD="ar -x"
                 USES_STDIN=false
                 USES_STDOUT=false
                 ;;
-            *.bz2)
+            *bz2)
                 DECOMP_CMD="bzip2 -d -c -"
                 USES_STDIN=true
                 USES_STDOUT=true
                 ;;
-            *.(gz|Z))
+            *(gz|Z))
                 DECOMP_CMD="gzip -d -c -"
                 USES_STDIN=true
                 USES_STDOUT=true
                 ;;
-            *.(xz|lzma))
+            *(xz|lzma))
                 DECOMP_CMD="xz -d -c -"
                 USES_STDIN=true
                 USES_STDOUT=true
@@ -604,6 +648,23 @@ simple-extract() {
     done
     return $RC
 }
+
+__archive_or_uri()
+{
+    _alternative \
+        'files:Archives:_files -g "*.(#l)(tar.bz2|tbz2|tbz|tar.gz|tgz|tar.xz|txz|tar.lzma|tar|rar|lzh|7z|zip|jar|deb|bz2|gz|Z|xz|lzma)"' \
+        '_urls:Remote Archives:_urls'
+}
+
+_simple_extract()
+{
+    _arguments \
+        '-d[delete original archivefile after extraction]' \
+        '*:Archive Or Uri:__archive_or_uri'
+}
+compdef _simple_extract simple-extract
+alias se=simple-extract
+
 
 #f5# cd to directoy and list files
 cl() {
