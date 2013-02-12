@@ -16,6 +16,9 @@ if [ ! -d "${TMP}" ]; then mkdir "${TMP}"; fi
 if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
 	export PATH="${HOME}/bin:${PATH}"
 fi
+if ! [[ "${PATH}" =~ "^/sbin" ]]; then
+    export PATH="/sbin:${PATH}"
+fi
 
 # Not all servers have terminfo for rxvt-256color. :<
 if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ] && ! [ -f "${HOME}/.terminfo/r/rxvt-256color" ]; then
@@ -336,6 +339,8 @@ if [[ "$HOST" = "defiant" ]]; then
     hcolor='%F{cyan}'
 elif [[ "$HOST" = "pathfinder" ]]; then
     hcolor='%F{yellow}'
+elif [[ "$HOST" = "DS9" ]]; then
+    hcolor='$F{green}'
 else
     hcolor='%F{blue}'
 fi
