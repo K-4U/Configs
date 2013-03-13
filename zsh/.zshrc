@@ -417,7 +417,7 @@ alias ls='ls --color=auto --human-readable --group-directories-first --classify 
 alias ll='ls -l'
 alias la='ls -a'
 alias tmux='tmux -2'
-
+alias lock='/usr/lib/lightdm/lightdm/gdmflexiserver'
 
 autoload zkbd
 [[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
