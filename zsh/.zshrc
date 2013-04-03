@@ -16,6 +16,13 @@ if [ ! -d "${TMP}" ]; then mkdir "${TMP}"; fi
 if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
 	export PATH="${HOME}/bin:${PATH}"
 fi
+if ! [[ "${PATH}" =~ "^/sbin" ]]; then
+    export PATH="/sbin:${PATH}"
+fi
+
+if ! [[ "${PATH}" =~ "^/usr/sbin" ]]; then
+    export PATH="/usr/sbin:${PATH}"
+fi
 
 # Not all servers have terminfo for rxvt-256color. :<
 if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ] && ! [ -f "${HOME}/.terminfo/r/rxvt-256color" ]; then
@@ -336,6 +343,8 @@ if [[ "$HOST" = "defiant" ]]; then
     hcolor='%F{cyan}'
 elif [[ "$HOST" = "pathfinder" ]]; then
     hcolor='%F{yellow}'
+elif [[ "$HOST" = "DS9" ]]; then
+    hcolor='$F{green}'
 else
     hcolor='%F{blue}'
 fi
@@ -408,7 +417,7 @@ alias ls='ls --color=auto --human-readable --group-directories-first --classify 
 alias ll='ls -l'
 alias la='ls -a'
 alias tmux='tmux -2'
-
+alias lock='/usr/lib/lightdm/lightdm/gdmflexiserver'
 
 autoload zkbd
 [[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
