@@ -87,7 +87,7 @@ compiz="$HOME/.config/compiz"
 zkbd="$HOME/.zkbd"
 #No global
 
-htop="$HOME/.config/htop/"
+htop="$HOME/.config/htop"
 #No global
 
 
