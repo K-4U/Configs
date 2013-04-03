@@ -84,8 +84,10 @@ tmux_global="/etc/tmux.conf"
 compiz="$HOME/.config/compiz"
 #No global
 
-
 zkbd="$HOME/.zkbd"
+#No global
+
+htop="$HOME/.config/htop/"
 #No global
 
 
@@ -97,7 +99,7 @@ vimdir_local="$local_dir/vim/vim"
 tmux_local="$local_dir/tmux/.tmux.conf"
 compiz_local="$local_dir/compiz/"
 zkbd_local="$local_dir/zkbd/"
-
+htop_local="$local_dir/htop/"
 
 function do_install() {
     # Sudo stuff
@@ -167,6 +169,7 @@ if [ $do_global == true ]; then
         echo " :: 'install.sh noglobal' to copy these files:"
         echo "    - zkbd config"
         echo "    - Vimdir. This file cannot be copied globally!"
+        echo "    - Htop config."
         if ! $is_server ; then
             echo "    - compiz config"
         fi
@@ -178,7 +181,8 @@ if [ $do_global == true ]; then
         echo " :: Done removing. Please keep in mind that you need to run"
         echo " :: 'install.sh noglobal remove' to remove these files:"
         echo "    - zkbd config"
-        echo "    - Vimdir."
+        echo "    - Vimdir"
+        echo "    - Htop config"
         if ! $is_server ; then
             echo "    - compiz config"
         fi
@@ -187,6 +191,7 @@ elif [ $no_global == true ]; then
     if ! $do_remove; then
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
+        do_install "$htop_local" "$htop"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
         fi
@@ -195,6 +200,7 @@ elif [ $no_global == true ]; then
     else
         do_remove "$zkbd"
         do_remove "$vimdir"
+        do_remove "$htop"
         if ! $is_server; then
             do_remove "$compiz"
         fi
@@ -208,6 +214,7 @@ else
         do_install "$vimdir_local" "$vimdir"
         do_install "$tmux_local" "$tmux" 
         do_install "$zkbd_local" "$zkbd"
+        do_install "$htop_local" "$htop"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
         fi
@@ -219,6 +226,7 @@ else
         do_remove "$vimdir"
         do_remove "$tmux"
         do_remove "$zkbd"
+        do_remove "$htop"
         if ! $is_server; then
             do_remove "$compiz"
         fi
