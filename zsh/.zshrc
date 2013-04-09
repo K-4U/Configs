@@ -755,6 +755,6 @@ bindkey "^S" history-incremental-pattern-search-forward
 alias tmux='tmux -2'
 alias homessh='ssh home.k-4u.nl -p 8228'
 alias mountpathfinder='sshfs koen@home.k-4u.nl:/ -p 8228 /media/pathfinder'
-
+alias timeUpdate='sudo ntpd -qg'
 
 if [ -f ~/.alert ]; then cat ~/.alert; fi
