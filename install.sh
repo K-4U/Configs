@@ -128,7 +128,7 @@ function do_install() {
             if [ -d $2 ]; then
                 cmd="rm -rf "$2""
             else
-                cmd="rm -f "$2""
+                cmd="rm -rf "$2""
             fi
         fi
         echo "$cmd_prefix$cmd"
