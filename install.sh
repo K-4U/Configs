@@ -87,9 +87,14 @@ compiz="$HOME/.config/compiz"
 zkbd="$HOME/.zkbd"
 #No global
 
-htop="$HOME/.config/htop"
+awesomerc_global="/etc/xdg/awesome/rc.lua"
+#No normal dir
+
+xinitrc="$HOME/.xinitrc"
 #No global
 
+xresources="$HOME/.Xresources"
+#No global
 
 # How are the files called in the repository
 local_dir="$( cd "$( dirname "$0" )" && pwd)"
@@ -99,7 +104,9 @@ vimdir_local="$local_dir/vim/vim"
 tmux_local="$local_dir/tmux/.tmux.conf"
 compiz_local="$local_dir/compiz/"
 zkbd_local="$local_dir/zkbd/"
-htop_local="$local_dir/htop/"
+awesomerc_local="$local_dir/awesome/rc.lua"
+xinitrc_local="$local_dir/x/.xinitrc"
+xresources_local="$local_dir/x/.Xresources"
 
 function do_install() {
     # Sudo stuff
@@ -164,45 +171,50 @@ if [ $do_global == true ]; then
         do_install "$zshrc_local" "$zshrc_global" "root"
         do_install "$vimrc_local" "$vimrc_global" "root"
         do_install "$tmux_local" "$tmux_global" "root"
+        do_install "$awesomerc_local" "$awesomerc_global" "root"
         echo ""
         echo " :: Done copying. Please keep in mind that you need to run "
         echo " :: 'install.sh noglobal' to copy these files:"
         echo "    - zkbd config"
-        echo "    - Vimdir. This file cannot be copied globally!"
-        echo "    - Htop config."
+        echo "    - Vimdir. This dir cannot be copied globally!"
         if ! $is_server ; then
             echo "    - compiz config"
+            echo "    - xinitrc"
+            echo "    - Xresources"
         fi
     else
         do_remove "$zshrc_global"
         do_remove "$vimrc_global"
         do_remove "$tmux_global"
+        do_remove "$awesomerc_global"
         echo ""
         echo " :: Done removing. Please keep in mind that you need to run"
         echo " :: 'install.sh noglobal remove' to remove these files:"
         echo "    - zkbd config"
         echo "    - Vimdir"
-        echo "    - Htop config"
         if ! $is_server ; then
             echo "    - compiz config"
+            echo "    - xinitrc"
+            echo "    - Xresources"
         fi
     fi
 elif [ $no_global == true ]; then
     if ! $do_remove; then
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
-        do_install "$htop_local" "$htop"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
         fi
         echo ""
         echo " :: Done installing."
+        echo " :: Please remember that Awesome RC cannot be installed locally!"
     else
         do_remove "$zkbd"
         do_remove "$vimdir"
-        do_remove "$htop"
         if ! $is_server; then
             do_remove "$compiz"
+            do_remove "$xinitrc"
+            do_remove "$xresources"
         fi
         echo ""
         echo " :: Done removing."
@@ -214,21 +226,25 @@ else
         do_install "$vimdir_local" "$vimdir"
         do_install "$tmux_local" "$tmux" 
         do_install "$zkbd_local" "$zkbd"
-        do_install "$htop_local" "$htop"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
+            do_install "$xinitrc_local" "$xinitrc"
+            do_install "$xresources_local" "$xresources"
         fi
         echo ""
         echo " :: Done installing files to $HOME"
+        echo " :: Please remember that Awesome RC cannot be installed to $HOME!"
     else
         do_remove "$zshrc"
         do_remove "$vimrc"
         do_remove "$vimdir"
         do_remove "$tmux"
         do_remove "$zkbd"
-        do_remove "$htop"
+        do_remove "$awesomerc"
         if ! $is_server; then
             do_remove "$compiz"
+            do_remove "$xinitrc_local" "$xinitrc"
+            do_remove "$xresources_local" "$xresources"
         fi
         echo ""
         echo " :: Done removing files from $HOME"

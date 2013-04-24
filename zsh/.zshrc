@@ -345,8 +345,10 @@ elif [[ "$HOST" = "pathfinder" ]]; then
     hcolor='%F{yellow}'
 elif [[ "$HOST" = "DS9" ]]; then
     hcolor='$F{green}'
-else
+elif [[ "$HOST" = "holodeck" ]]; then
     hcolor='%F{blue}'
+else
+    hcolor='%F{white}'
 fi
 
 
