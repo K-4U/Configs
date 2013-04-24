@@ -263,6 +263,20 @@ man() {
 	fi
 }
 
+
+#Script to move a file to its .back equivalent.
+backup() {
+    if (( $# == 0 )) then
+        echo "Usage: backup <files>"
+        echo "Accepts multiple files"
+    else
+        for FILE in "${@}"; do
+            echo "Backup $FILE to $FILE.bak"
+            mv "$FILE" "$FILE.bak"
+        done;        
+    fi
+}
+
 # Are we running under grsecurity's RBAC?
 rbac_auth() {
 	local auth_to_role='admin'
@@ -345,8 +359,10 @@ elif [[ "$HOST" = "pathfinder" ]]; then
     hcolor='%F{yellow}'
 elif [[ "$HOST" = "DS9" ]]; then
     hcolor='$F{green}'
-else
+elif [[ "$HOST" = "holodeck" ]]; then
     hcolor='%F{blue}'
+else
+    hcolor='%F{white}'
 fi
 
 
@@ -482,6 +498,7 @@ source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
 check_com() {
     emulate -L zsh
     local -i comonly gatoo
+
 
     if [[ $1 == '-c' ]] ; then
         (( comonly = 1 ))

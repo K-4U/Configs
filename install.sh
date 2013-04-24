@@ -87,7 +87,16 @@ compiz="$HOME/.config/compiz"
 zkbd="$HOME/.zkbd"
 #No global
 
-htop="$HOME/.config/htop"
+awesomerc_global="/etc/xdg/awesome/rc.lua"
+#No normal dir
+
+xinitrc="$HOME/.xinitrc"
+#No global
+
+xresources="$HOME/.Xresources"
+#No global
+
+gitconfig="$HOME/.gitconfig"
 #No global
 
 
@@ -99,64 +108,68 @@ vimdir_local="$local_dir/vim/vim"
 tmux_local="$local_dir/tmux/.tmux.conf"
 compiz_local="$local_dir/compiz/"
 zkbd_local="$local_dir/zkbd/"
-htop_local="$local_dir/htop/"
+awesomerc_local="$local_dir/awesome/rc.lua"
+xinitrc_local="$local_dir/x/.xinitrc"
+xresources_local="$local_dir/x/.Xresources"
+gitconfig_local="$local_dir/git/.gitconfig"
+
 
 function do_install() {
-    # Sudo stuff
-    cmd_prefix=""
-    if [ $# -eq 3 ]; then
-        if ! $do_root; then
-            echo " :: Ignoring root file $2"
-            return
-        else
-            cmd_prefix="sudo "
-        fi
+# Sudo stuff
+cmd_prefix=""
+if [ $# -eq 3 ]; then
+    if ! $do_root; then
+        echo " :: Ignoring root file $2"
+        return
     else
-        if $do_root; then #For when root might be needed to copy the files
-            cmd_prefix="sudo "
-        fi
+        cmd_prefix="sudo "
     fi
+else
+    if $do_root; then #For when root might be needed to copy the files
+        cmd_prefix="sudo "
+    fi
+fi
 
-    echo " :: Installing $1 as $2"
+echo " :: Installing $1 as $2"
 
-    # File already exists?
-    if $cmd_prefix [ -e $2 ]; then
-       echo " :: File exists $2" 
-	    if $make_backups; then
-            cmd="mv "$2" "$2.bak""
+# File already exists?
+if $cmd_prefix [ -e $2 ]; then
+    echo " :: File exists $2" 
+    if $make_backups; then
+        cmd="mv "$2" "$2.bak""
+    else
+        if [ -d $2 ]; then
+            cmd="rm -rf "$2""
         else
-            if [ -d $2 ]; then
-                cmd="rm -rf "$2""
-            else
-                cmd="rm -f "$2""
-            fi
+            cmd="rm -rf "$2""
         fi
-        echo "$cmd_prefix$cmd"
-        $($cmd_prefix$cmd)
     fi
-
-    cmd="ln -sT "$1" "$2""
     echo "$cmd_prefix$cmd"
     $($cmd_prefix$cmd)
+fi
+
+cmd="ln -sT "$1" "$2""
+echo "$cmd_prefix$cmd"
+$($cmd_prefix$cmd)
 }
 
 function do_remove(){
-    cmd_prefix=""
-    if $do_root; then
-        cmd_prefix="sudo "
-    fi
+cmd_prefix=""
+if $do_root; then
+    cmd_prefix="sudo "
+fi
 
-    # File already exists?
-    if $cmd_prefix [ -e $1 ]; then
-        echo " :: File exists $1" 
-        if [ -d $1 ]; then
-            cmd="rm -rf "$1""
-        else
-            cmd="rm -f "$1""
-        fi
-        echo "$cmd_prefix$cmd"
-        $($cmd_prefix$cmd)
+# File already exists?
+if $cmd_prefix [ -e $1 ]; then
+    echo " :: File exists $1" 
+    if [ -d $1 ]; then
+        cmd="rm -rf "$1""
+    else
+        cmd="rm -f "$1""
     fi
+    echo "$cmd_prefix$cmd"
+    $($cmd_prefix$cmd)
+fi
 }
 
 if [ $do_global == true ]; then
@@ -164,45 +177,54 @@ if [ $do_global == true ]; then
         do_install "$zshrc_local" "$zshrc_global" "root"
         do_install "$vimrc_local" "$vimrc_global" "root"
         do_install "$tmux_local" "$tmux_global" "root"
+        do_install "$awesomerc_local" "$awesomerc_global" "root"
         echo ""
         echo " :: Done copying. Please keep in mind that you need to run "
         echo " :: 'install.sh noglobal' to copy these files:"
         echo "    - zkbd config"
-        echo "    - Vimdir. This file cannot be copied globally!"
-        echo "    - Htop config."
+        echo "    - Vimdir. This dir cannot be copied globally!"
+        echo "    - Git config"
         if ! $is_server ; then
             echo "    - compiz config"
+            echo "    - xinitrc"
+            echo "    - Xresources"
         fi
     else
         do_remove "$zshrc_global"
         do_remove "$vimrc_global"
         do_remove "$tmux_global"
+        do_remove "$awesomerc_global"
         echo ""
         echo " :: Done removing. Please keep in mind that you need to run"
         echo " :: 'install.sh noglobal remove' to remove these files:"
         echo "    - zkbd config"
         echo "    - Vimdir"
-        echo "    - Htop config"
+        echo "    - Git config"
         if ! $is_server ; then
             echo "    - compiz config"
+            echo "    - xinitrc"
+            echo "    - Xresources"
         fi
     fi
 elif [ $no_global == true ]; then
     if ! $do_remove; then
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
-        do_install "$htop_local" "$htop"
+        do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
         fi
         echo ""
         echo " :: Done installing."
+        echo " :: Please remember that Awesome RC cannot be installed locally!"
     else
         do_remove "$zkbd"
         do_remove "$vimdir"
-        do_remove "$htop"
+        do_remove "$gitconfig"
         if ! $is_server; then
             do_remove "$compiz"
+            do_remove "$xinitrc"
+            do_remove "$xresources"
         fi
         echo ""
         echo " :: Done removing."
@@ -214,21 +236,27 @@ else
         do_install "$vimdir_local" "$vimdir"
         do_install "$tmux_local" "$tmux" 
         do_install "$zkbd_local" "$zkbd"
-        do_install "$htop_local" "$htop"
+        do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
+            do_install "$xinitrc_local" "$xinitrc"
+            do_install "$xresources_local" "$xresources"
         fi
         echo ""
         echo " :: Done installing files to $HOME"
+        echo " :: Please remember that Awesome RC cannot be installed to $HOME!"
     else
         do_remove "$zshrc"
         do_remove "$vimrc"
         do_remove "$vimdir"
         do_remove "$tmux"
         do_remove "$zkbd"
-        do_remove "$htop"
+        do_remove "$awesomerc"
+        do_remove "$gitconfig"
         if ! $is_server; then
             do_remove "$compiz"
+            do_remove "$xinitrc_local" "$xinitrc"
+            do_remove "$xresources_local" "$xresources"
         fi
         echo ""
         echo " :: Done removing files from $HOME"

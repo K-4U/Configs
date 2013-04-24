@@ -1,0 +1,61 @@
+!
+! xterm
+!
+xterm*background: #000000
+xterm*foreground: #ffffff
+
+!
+! urxvt (rxvt-unicode)
+!
+URxvt*depth: 32 
+URxvt*background: [75]#272822
+URxvt*foreground: #F8F8F2
+
+! Tabs
+URxvt.perl-ext-common: default,tabbed
+URxvt.tabbed.tabbar-fg: 2
+URxvt.tabbed.tabbar-bg: 0
+URxvt.tabbed.tab-fg: 3
+URxvt.tabbed.tab-bg: 0
+
+URxvt.scrollBar: false
+URxvt*termName: rxvt-256color
+URxvt.intensityStyles: false
+URxvt.perl-ext: default,url-select,clipboard,tabbed
+! Open urls
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-select.launcher: firefox
+URxvt.url-select.underline: true
+URxvt.colorUL: #4682B4
+! Clipboard integration with X
+URxvt.keysym.M-c: perl:clipboard:copy
+URxvt.keysym.M-v: perl:clipboard:paste
+! That utf8 input box thing when pressing ctrl+shift
+URxvt.iso14755: false
+
+
+
+! black
+URxvt*color0  : #2E3436
+URxvt*color8  : #555753
+! red
+URxvt*color1  : #CC0000
+URxvt*color9  : #EF2929
+! green
+URxvt*color2  : #4E9A06
+URxvt*color10 : #8AE234
+! yellow
+URxvt*color3  : #C4A000
+URxvt*color11 : #FCE94F
+! blue
+URxvt*color4  : #3465A4
+URxvt*color12 : #729FCF
+! magenta
+URxvt*color5  : #75507B
+URxvt*color13 : #AD7FA8
+! cyan
+URxvt*color6  : #06989A
+URxvt*color14 : #34E2E2
+! white
+URxvt*color7  : #D3D7CF
+URxvt*color15 : #EEEEEC
