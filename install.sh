@@ -16,7 +16,7 @@ do_global=false
 no_global=false
 
 
-is_server=true
+is_server=false
 make_backups=false
 root_homedir="/root"
 
@@ -88,7 +88,6 @@ zkbd="$HOME/.zkbd"
 #No global
 
 awesomerc_global="/etc/xdg/awesome/rc.lua"
-#No normal dir
 
 xinitrc="$HOME/.xinitrc"
 #No global
@@ -112,7 +111,6 @@ awesomerc_local="$local_dir/awesome/rc.lua"
 xinitrc_local="$local_dir/x/.xinitrc"
 xresources_local="$local_dir/x/.Xresources"
 gitconfig_local="$local_dir/git/.gitconfig"
-
 
 function do_install() {
 # Sudo stuff
@@ -177,7 +175,9 @@ if [ $do_global == true ]; then
         do_install "$zshrc_local" "$zshrc_global" "root"
         do_install "$vimrc_local" "$vimrc_global" "root"
         do_install "$tmux_local" "$tmux_global" "root"
-        do_install "$awesomerc_local" "$awesomerc_global" "root"
+        if ! $is_server ; then
+            do_install "$awesomerc_local" "$awesomerc_global" "root"
+        fi
         echo ""
         echo " :: Done copying. Please keep in mind that you need to run "
         echo " :: 'install.sh noglobal' to copy these files:"
@@ -193,7 +193,9 @@ if [ $do_global == true ]; then
         do_remove "$zshrc_global"
         do_remove "$vimrc_global"
         do_remove "$tmux_global"
-        do_remove "$awesomerc_global"
+        if ! $is_server ; then
+            do_remove "$awesomerc_global"
+        fi
         echo ""
         echo " :: Done removing. Please keep in mind that you need to run"
         echo " :: 'install.sh noglobal remove' to remove these files:"
@@ -213,10 +215,11 @@ elif [ $no_global == true ]; then
         do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
+            do_install "$xinitrc_local" "$xinitrc"
+            do_install "$xresources_local" "$xresources"
         fi
         echo ""
         echo " :: Done installing."
-        echo " :: Please remember that Awesome RC cannot be installed locally!"
     else
         do_remove "$zkbd"
         do_remove "$vimdir"
@@ -244,19 +247,19 @@ else
         fi
         echo ""
         echo " :: Done installing files to $HOME"
-        echo " :: Please remember that Awesome RC cannot be installed to $HOME!"
+        echo " :: Please keep in mind that Awesomerc cannot be copied to your home dir!"
     else
         do_remove "$zshrc"
         do_remove "$vimrc"
         do_remove "$vimdir"
         do_remove "$tmux"
         do_remove "$zkbd"
-        do_remove "$awesomerc"
         do_remove "$gitconfig"
         if ! $is_server; then
+            do_remove "$awesomerc"
             do_remove "$compiz"
-            do_remove "$xinitrc_local" "$xinitrc"
-            do_remove "$xresources_local" "$xresources"
+            do_remove "$xinitrc"
+            do_remove "$xresources"
         fi
         echo ""
         echo " :: Done removing files from $HOME"
