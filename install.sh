@@ -96,6 +96,10 @@ xinitrc="$HOME/.xinitrc"
 xresources="$HOME/.Xresources"
 #No global
 
+gitconfig="$HOME/.gitconfig"
+#No global
+
+
 # How are the files called in the repository
 local_dir="$( cd "$( dirname "$0" )" && pwd)"
 zshrc_local="$local_dir/zsh/.zshrc"
@@ -107,63 +111,65 @@ zkbd_local="$local_dir/zkbd/"
 awesomerc_local="$local_dir/awesome/rc.lua"
 xinitrc_local="$local_dir/x/.xinitrc"
 xresources_local="$local_dir/x/.Xresources"
+gitconfig_local="$local_dir/git/.gitconfig"
+
 
 function do_install() {
-    # Sudo stuff
-    cmd_prefix=""
-    if [ $# -eq 3 ]; then
-        if ! $do_root; then
-            echo " :: Ignoring root file $2"
-            return
-        else
-            cmd_prefix="sudo "
-        fi
+# Sudo stuff
+cmd_prefix=""
+if [ $# -eq 3 ]; then
+    if ! $do_root; then
+        echo " :: Ignoring root file $2"
+        return
     else
-        if $do_root; then #For when root might be needed to copy the files
-            cmd_prefix="sudo "
-        fi
+        cmd_prefix="sudo "
     fi
+else
+    if $do_root; then #For when root might be needed to copy the files
+        cmd_prefix="sudo "
+    fi
+fi
 
-    echo " :: Installing $1 as $2"
+echo " :: Installing $1 as $2"
 
-    # File already exists?
-    if $cmd_prefix [ -e $2 ]; then
-       echo " :: File exists $2" 
-	    if $make_backups; then
-            cmd="mv "$2" "$2.bak""
+# File already exists?
+if $cmd_prefix [ -e $2 ]; then
+    echo " :: File exists $2" 
+    if $make_backups; then
+        cmd="mv "$2" "$2.bak""
+    else
+        if [ -d $2 ]; then
+            cmd="rm -rf "$2""
         else
-            if [ -d $2 ]; then
-                cmd="rm -rf "$2""
-            else
-                cmd="rm -rf "$2""
-            fi
+            cmd="rm -rf "$2""
         fi
-        echo "$cmd_prefix$cmd"
-        $($cmd_prefix$cmd)
     fi
-
-    cmd="ln -sT "$1" "$2""
     echo "$cmd_prefix$cmd"
     $($cmd_prefix$cmd)
+fi
+
+cmd="ln -sT "$1" "$2""
+echo "$cmd_prefix$cmd"
+$($cmd_prefix$cmd)
 }
 
 function do_remove(){
-    cmd_prefix=""
-    if $do_root; then
-        cmd_prefix="sudo "
-    fi
+cmd_prefix=""
+if $do_root; then
+    cmd_prefix="sudo "
+fi
 
-    # File already exists?
-    if $cmd_prefix [ -e $1 ]; then
-        echo " :: File exists $1" 
-        if [ -d $1 ]; then
-            cmd="rm -rf "$1""
-        else
-            cmd="rm -f "$1""
-        fi
-        echo "$cmd_prefix$cmd"
-        $($cmd_prefix$cmd)
+# File already exists?
+if $cmd_prefix [ -e $1 ]; then
+    echo " :: File exists $1" 
+    if [ -d $1 ]; then
+        cmd="rm -rf "$1""
+    else
+        cmd="rm -f "$1""
     fi
+    echo "$cmd_prefix$cmd"
+    $($cmd_prefix$cmd)
+fi
 }
 
 if [ $do_global == true ]; then
@@ -177,6 +183,7 @@ if [ $do_global == true ]; then
         echo " :: 'install.sh noglobal' to copy these files:"
         echo "    - zkbd config"
         echo "    - Vimdir. This dir cannot be copied globally!"
+        echo "    - Git config"
         if ! $is_server ; then
             echo "    - compiz config"
             echo "    - xinitrc"
@@ -192,6 +199,7 @@ if [ $do_global == true ]; then
         echo " :: 'install.sh noglobal remove' to remove these files:"
         echo "    - zkbd config"
         echo "    - Vimdir"
+        echo "    - Git config"
         if ! $is_server ; then
             echo "    - compiz config"
             echo "    - xinitrc"
@@ -202,6 +210,7 @@ elif [ $no_global == true ]; then
     if ! $do_remove; then
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
+        do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
         fi
@@ -211,6 +220,7 @@ elif [ $no_global == true ]; then
     else
         do_remove "$zkbd"
         do_remove "$vimdir"
+        do_remove "$gitconfig"
         if ! $is_server; then
             do_remove "$compiz"
             do_remove "$xinitrc"
@@ -226,6 +236,7 @@ else
         do_install "$vimdir_local" "$vimdir"
         do_install "$tmux_local" "$tmux" 
         do_install "$zkbd_local" "$zkbd"
+        do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
             do_install "$compiz_local" "$compiz"
             do_install "$xinitrc_local" "$xinitrc"
@@ -241,6 +252,7 @@ else
         do_remove "$tmux"
         do_remove "$zkbd"
         do_remove "$awesomerc"
+        do_remove "$gitconfig"
         if ! $is_server; then
             do_remove "$compiz"
             do_remove "$xinitrc_local" "$xinitrc"
