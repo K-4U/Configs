@@ -190,7 +190,7 @@ git_check_if_worktree() {
 		# running 'git' in repo changes owner of git's index files to root, skip prompt git magic if CWD=/home/*
 		git_check_if_workdir_path="${git_check_if_workdir_path:-/root:/etc}"
 	else
-		git_check_if_workdir_path="${git_check_if_workdir_path:-/home}"
+		git_check_if_workdir_path="${git_check_if_workdir_path:-/home:/data}"
 		git_check_if_workdir_path_exclude="${git_check_if_workdir_path_exclude:-${HOME}/_sshfs}"
 	fi
 
