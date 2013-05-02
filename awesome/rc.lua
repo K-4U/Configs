@@ -15,6 +15,11 @@ local vicious = require("vicious")
 
 awful.util.spawn_with_shell("cairo-compmgr &")
 
+function start_with_notify(command, name)
+    awful.util.spawn(command)
+    naughty.notify({ text = "Starting " .. name})
+end
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -43,7 +48,7 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-
+--beautiful.theme.wallpaper = "/home/koen/Dropbox/Fabienne/Galaxywallpaper1.png"
 -- Fetch hostname
 hostname = awful.util.pread("hostname"):gsub("\n","")
 
@@ -101,7 +106,7 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "firefox", "irc", "pidgin", "work", 5, 6, 7, 8, 9 }, s, layouts[4])
+    tags[s] = awful.tag({ "firefox", "irc", "social", "work", 5, 6, 7, 8, 9 }, s, layouts[4])
 end
 -- }}}
 
@@ -164,6 +169,26 @@ vicious.register(cpuwidget,
              cputooltip:set_text("CPU: "..args[1].."%")
              return args[1]
          end)
+
+
+-- {{{ Cmus info
+--musicicon = awful.widget.imagebox()
+--musicicon.image = image(beautiful.widget_music)
+-- Initialize widget
+cmus_widget = wibox.widget.textbox("")
+-- Register widget
+vicious.register(cmus_widget, vicious.widgets.cmus,
+    function (widget, args)
+        if args["{status}"] == "Stopped" then 
+            return " - "
+        else 
+            return args["{status}"]..': '.. args["{artist}"]..' - '.. args["{title}"]
+        end
+     end, 7)
+--}}}
+
+    
+
 
 -- Network graph
 networkwidget = awful.widget.graph()
@@ -317,6 +342,8 @@ for s = 1, screen.count() do
         right_layout:add(wibox.widget.systray())
         right_layout:add(sep)
     end
+    right_layout:add(cmus_widget)
+    right_layout:add(sep)
     right_layout:add(volumecfg.widget)
     right_layout:add(sep)
     right_layout:add(cpuwidget)
@@ -378,9 +405,10 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "q", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey,           }, "f", function () awful.util.spawn(browser) end),
+    awful.key({ modkey,           }, "Return", function () start_with_notify(terminal,"Terminal") end),
+    awful.key({ modkey,           }, "s", function () start_with_notify("skype","Skype") end),
+    awful.key({ modkey,           }, "q", function () start_with_notify("qtcreator", "QTCreator") end),
+    awful.key({ modkey,           }, "f", function () start_with_notify(browser, "Firefox") end),
     awful.key({ modkey,           }, "v", function () awful.util.spawn(lock_command) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     --awful.key({ modkey, "Shift"   }, "q", awesome.quit),
@@ -415,7 +443,13 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86AudioLowerVolume", function ()
         volumecfg.down() end),
     awful.key({ }, "XF86AudioMute", function ()
-        volumecfg.toggle() end)
+        volumecfg.toggle() end),
+    awful.key({ }, "XF86AudioPlay", function ()
+        awful.util.spawn("cmus-remote -u") end),
+    awful.key({ }, "XF86AudioNext", function ()
+        awful.util.spawn("cmus-remote -n") end),
+    awful.key({ }, "XF86AudioPrev", function ()
+        awful.util.spawn("cmus-remote -p") end)
 )
 
 clientkeys = awful.util.table.join(
@@ -503,9 +537,15 @@ awful.rules.rules = {
     { rule = { class = "Pidgin" },
       properties = { tag = tags[1][3] } },
 
-     --Set Firefox to always map on tags number 2 of screen 1.
+    { rule = { class = "Steam" },
+      properties = { tag = tags[1][5] } },
+
+    { rule = { class = "Skype" },
+      properties = {floating = false, tag = tags[1][3] } },
+    { rule = { class = "Qtcreator" },
+      properties = {floating = false, tag = tags[1][4] } },
      { rule = { class = "Firefox" },
-       properties = { tag = tags[1][1] } },
+       properties = {floating = false, tag = tags[1][1] } },
 }
 -- }}}
 

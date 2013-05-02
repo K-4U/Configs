@@ -87,7 +87,8 @@ compiz="$HOME/.config/compiz"
 zkbd="$HOME/.zkbd"
 #No global
 
-awesomerc_global="/etc/xdg/awesome/rc.lua"
+awesome_global="/etc/xdg/awesome"
+awesome="$HOME/.config/awesome"
 
 xinitrc="$HOME/.xinitrc"
 #No global
@@ -107,7 +108,7 @@ vimdir_local="$local_dir/vim/vim"
 tmux_local="$local_dir/tmux/.tmux.conf"
 compiz_local="$local_dir/compiz/"
 zkbd_local="$local_dir/zkbd/"
-awesomerc_local="$local_dir/awesome/rc.lua"
+awesome_local="$local_dir/awesome"
 xinitrc_local="$local_dir/x/.xinitrc"
 xresources_local="$local_dir/x/.Xresources"
 gitconfig_local="$local_dir/git/.gitconfig"
@@ -176,7 +177,7 @@ if [ $do_global == true ]; then
         do_install "$vimrc_local" "$vimrc_global" "root"
         do_install "$tmux_local" "$tmux_global" "root"
         if ! $is_server ; then
-            do_install "$awesomerc_local" "$awesomerc_global" "root"
+            do_install "$awesome_local" "$awesome_global" "root"
         fi
         echo ""
         echo " :: Done copying. Please keep in mind that you need to run "
@@ -194,7 +195,7 @@ if [ $do_global == true ]; then
         do_remove "$vimrc_global"
         do_remove "$tmux_global"
         if ! $is_server ; then
-            do_remove "$awesomerc_global"
+            do_remove "$awesome_global"
         fi
         echo ""
         echo " :: Done removing. Please keep in mind that you need to run"
@@ -241,6 +242,7 @@ else
         do_install "$zkbd_local" "$zkbd"
         do_install "$gitconfig_local" "$gitconfig"
         if ! $is_server; then
+            do_install "$awesome_local" "$awesome"
             do_install "$compiz_local" "$compiz"
             do_install "$xinitrc_local" "$xinitrc"
             do_install "$xresources_local" "$xresources"
@@ -256,7 +258,7 @@ else
         do_remove "$zkbd"
         do_remove "$gitconfig"
         if ! $is_server; then
-            do_remove "$awesomerc"
+            do_remove "$awesome"
             do_remove "$compiz"
             do_remove "$xinitrc"
             do_remove "$xresources"
