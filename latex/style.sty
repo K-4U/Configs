@@ -13,7 +13,7 @@
 \usepackage{hyperref} %For hyperlinks
 
 
-\renewcommand{\familydefault}{\sfdefault} %Other font
+% \renewcommand{\familydefault}{\sfdefault} %Other font
 
 %For code highlighting
 \usepackage{minted}
@@ -49,22 +49,22 @@
 
 
 %Setting the headers
-\fancyhead[LE,RO]{\slshape \rightmark}
-\fancyhead[LO,RE]{\slshape \leftmark}
+\fancyhead[L,RO]{\slshape \rightmark}
+\fancyhead[LO,R]{\slshape \leftmark}
 
 %Setting the footers
 \makeatletter
 %Left footer
-\fancyfoot[RE, LO] {\@title\ - \@author\ (\@studentNumber)\ - \@class \\ \@institute}
+\fancyfoot[R, LO] {\@title\ - \@author\ (\@studentNumber)\ - \@class \\ \@institute}
 %Right footer
-\fancyfoot[RO, LE] {\thepage\ of \pageref{LastPage}}
+\fancyfoot[RO, L] {\thepage\ of \pageref{LastPage}}
 
 %This is for pages where the pagestyle is plain
 %For example, pages with a chapter
 \fancypagestyle{plain}{%
 \fancyhf{} % clear all header and footer fields
-\fancyfoot[RE, LO] {\@title\ - \@author\ (\@studentNumber)\ - \@class \\ \@institute}
-\fancyfoot[RO, LE] {\thepage\ of \pageref{LastPage}}
+\fancyfoot[R, LO] {\@title\ - \@author\ (\@studentNumber)\ - \@class \\ \@institute}
+\fancyfoot[RO, L] {\thepage\ of \pageref{LastPage}}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.4pt}}
 
