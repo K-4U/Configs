@@ -420,6 +420,7 @@ alias rm='rm -iv'
 alias ln='ln -v'
 alias chmod="chmod -c"
 alias chown="chown -c"
+alias viewImages="feh -g 640x480 -d -S filename"
 
 if command -v colordiff > /dev/null 2>&1; then
 	alias diff="colordiff -Nuar"
