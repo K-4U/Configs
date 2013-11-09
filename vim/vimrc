@@ -21,9 +21,6 @@ set hidden
 set nobackup
 set nowritebackup
 set noswapfile
-"set textwidth=80 " 80 chars per line
-"set colorcolumn=+1 " 80 char mark
-"set linebreak " Break lines after 80 chars at logical points
 set wrap " And otherwise always
 set number " Line numbers
 set numberwidth=5 " 99999 lines max
@@ -39,6 +36,11 @@ endif
 " according to the detected filetype.
 if has("autocmd")
   filetype plugin indent on
+    set textwidth=80 " 80 chars per line
+    set colorcolumn=+1 " 80 char mark
+    set linebreak " Break lines after 80 chars at logical points
+    autocmd FileType php set textwidth=999999
+    autocmd FileType smarty set textwidth=999999
 endif
 
 " The following are commented out as they cause vim to behave a lot
@@ -105,7 +107,14 @@ let g:DoxygenToolkit_authorName="K-4U"
 
 " This is for highlighting 80+chars
 highlight OverLength ctermbg=52 ctermfg=white guibg=#610B0B
-match OverLength /\%81v.\+/
+match OverLength /\%79v.\+/
+
+autocmd FileType php match OverLength /\%999999v.\+/
+autocmd FileType smarty match OverLength /\%999999v.\+/
+
+" Also, remap jj to escape and ; to : for quicker stuff
+nnoremap ; :
+inoremap jj <Esc>
 
 
 " Source a global configuration file if available
