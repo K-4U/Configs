@@ -8,7 +8,7 @@ xterm*foreground: #ffffff
 ! urxvt (rxvt-unicode)
 !
 URxvt*depth: 32 
-URxvt*background: [75]#272822
+URxvt*background: [85]#272822
 URxvt*foreground: #F8F8F2
 
 ! Tabs

@@ -13,9 +13,12 @@ local menubar = require("menubar")
 -- Extra widgets
 local vicious = require("vicious")
 
-
 awful.util.spawn_with_shell("cairo-compmgr &")
 
+function start_with_notify(command, name)
+    awful.util.spawn(command)
+    naughty.notify({ text = "Starting " .. name})
+end
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -45,7 +48,7 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-
+--beautiful.theme.wallpaper = "/home/koen/Dropbox/Fabienne/Galaxywallpaper1.png"
 -- Fetch hostname
 hostname = awful.util.pread("hostname"):gsub("\n","")
 
@@ -103,7 +106,7 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "firefox", "irc", "pidgin", "work", 5, 6, 7, 8, 9 }, s, layouts[4])
+    tags[s] = awful.tag({ "firefox", "irc", "social", "work", 5, 6, 7, 8, 9 }, s, layouts[4])
 end
 -- }}}
 
@@ -137,12 +140,126 @@ local gradient_col = {  type = "linear",
                         to   = { 0, 0 },
                         stops = { { 0, "#AECF96" }, { 1, "#FF5656" } } }
 
+-- Memory usage widget
+memwidget = awful.widget.progressbar()
+memwidget:set_width(8)
+memwidget:set_height(20)
+memwidget:set_vertical(true)
+memwidget:set_background_color("#494B4F")
+memwidget:set_border_color(nil)
+memwidget:set_color(gradient_col)
+memtooltip = awful.tooltip({ objects = { memwidget }, })
+vicious.register(memwidget,
+        vicious.widgets.mem,
+        function (widget, args)
+            memtooltip:set_text(args[1].."% (".. args[2].."MB / "..args[3].."MB)")
+            return args[1]
+        end,
+        2)
 
+-- CPU graph
+cpuwidget = awful.widget.graph()
+cpuwidget:set_width(50)
+cpuwidget:set_background_color("#494B4F")
+cpuwidget:set_color(gradient_col)
+cputooltip = awful.tooltip({ objects = { cpuwidget }, })
+vicious.register(cpuwidget,
+         vicious.widgets.cpu,
+         function (widget, args)
+             cputooltip:set_text("CPU: "..args[1].."%")
+             return args[1]
+         end)
+
+
+-- {{{ Cmus info
+--musicicon = awful.widget.imagebox()
+--musicicon.image = image(beautiful.widget_music)
+-- Initialize widget
+cmus_widget = wibox.widget.textbox("")
+-- Register widget
+vicious.register(cmus_widget, vicious.widgets.cmus,
+    function (widget, args)
+        if args["{status}"] == "Stopped" then 
+            return " - "
+        else 
+            return args["{status}"]..': '.. args["{artist}"]..' - '.. args["{title}"]
+        end
+     end, 7)
+--}}}
+
+    
+
+
+-- Network graph
+networkwidget = awful.widget.graph()
+networkwidget:set_width(50)
+networkwidget:set_background_color("#494B4F")
+networkwidget:set_color(gradient_col)
+networktooltip = awful.tooltip({ objects = { networkwidget }, })
+vicious.register(networkwidget,
+        vicious.widgets.net,
+        function (widget, args)
+            local dk = args["{"..network_interface.." down_kb}"]
+            local uk = args["{"..network_interface.." up_kb}"]
+            local dm = args["{"..network_interface.." down_mb}"]
+            local um = args["{"..network_interface.." up_mb}"]
+            if dk == nil or uk == nil or dm == nil or um == nil then
+                networktooltip:set_text("Network: interface not found")
+                return 100
+            end
+            networktooltip:set_text("Network: "..dk.."KB/s "..uk.."KB/s")
+            return 100 * (dm + um)
+        end)
+
+-- Volume
+volumecfg = {}
+volumecfg.cardid  = 0
+volumecfg.channel = "Master"
+volumecfg.widget = wibox.widget.textbox()
+
+volumecfg_t = awful.tooltip({ objects = { volumecfg.widget },})
+volumecfg_t:set_text("Volume")
+
+volumecfg.mixercommand = function (command)
+    local fd = io.popen("amixer -c " .. volumecfg.cardid .. command)
+    local status = fd:read("*all")
+    fd:close()
+
+    local volume = string.match(status, "(%d?%d?%d)%%")
+    if not volume then
+        volume = "EE"
+    else
+        volume = string.format("% 3d", volume)
+        status = string.match(status, "%[(o[^%]]*)%]")
+        if string.find(status, "on", 1, true) then
+            volume = volume .. "%"
+        else
+            volume = volume .. "M"
+        end
+    end
+    volumecfg.widget:set_text(volume)
+end
+volumecfg.update = function ()
+    volumecfg.mixercommand(" sget " .. volumecfg.channel)
+end
+volumecfg.up = function ()
+    volumecfg.mixercommand(" sset " .. volumecfg.channel .. " 1%+")
+end
+volumecfg.down = function ()
+    volumecfg.mixercommand(" sset " .. volumecfg.channel .. " 1%-")
+end
+volumecfg.toggle = function ()
+    volumecfg.mixercommand(" sset " .. volumecfg.channel .. " toggle")
+end
+volumecfg.widget:buttons({
+    button({ }, 4, function () volumecfg.up() end),
+    button({ }, 5, function () volumecfg.down() end),
+    button({ }, 1, function () volumecfg.toggle() end)
+})
+volumecfg.update()
 
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
-
-
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -220,7 +337,20 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if s == 1 then right_layout:add(wibox.widget.systray()) end
+    right_layout:add(sep)
+    if s == 1 then
+        right_layout:add(wibox.widget.systray())
+        right_layout:add(sep)
+    end
+    right_layout:add(cmus_widget)
+    right_layout:add(sep)
+    right_layout:add(volumecfg.widget)
+    right_layout:add(sep)
+    right_layout:add(cpuwidget)
+    right_layout:add(sep)
+    right_layout:add(memwidget)
+    right_layout:add(sep)
+    right_layout:add(networkwidget)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
 
@@ -275,9 +405,13 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
+    awful.key({ modkey,           }, "Return", function () start_with_notify(terminal,"Terminal") end),
+    awful.key({ modkey,           }, "s", function () start_with_notify("skype","Skype") end),
+    awful.key({ modkey,           }, "q", function () start_with_notify("qtcreator", "QTCreator") end),
+    awful.key({ modkey,           }, "f", function () start_with_notify(browser, "Firefox") end),
+    awful.key({ modkey,           }, "v", function () awful.util.spawn(lock_command) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
-    awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+    --awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
@@ -301,7 +435,21 @@ globalkeys = awful.util.table.join(
                   awful.util.getdir("cache") .. "/history_eval")
               end),
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end)
+    awful.key({ modkey }, "p", function() menubar.show() end),
+
+    -- Sound control
+    awful.key({ }, "XF86AudioRaiseVolume", function ()
+        volumecfg.up() end),
+    awful.key({ }, "XF86AudioLowerVolume", function ()
+        volumecfg.down() end),
+    awful.key({ }, "XF86AudioMute", function ()
+        volumecfg.toggle() end),
+    awful.key({ }, "XF86AudioPlay", function ()
+        awful.util.spawn("cmus-remote -u") end),
+    awful.key({ }, "XF86AudioNext", function ()
+        awful.util.spawn("cmus-remote -n") end),
+    awful.key({ }, "XF86AudioPrev", function ()
+        awful.util.spawn("cmus-remote -p") end)
 )
 
 clientkeys = awful.util.table.join(
@@ -385,9 +533,19 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+
+    { rule = { class = "Pidgin" },
+      properties = { tag = tags[1][3] } },
+
+    { rule = { class = "Steam" },
+      properties = { tag = tags[1][5] } },
+
+    { rule = { class = "Skype" },
+      properties = {floating = false, tag = tags[1][3] } },
+    { rule = { class = "Qtcreator" },
+      properties = {floating = false, tag = tags[1][4] } },
+     { rule = { class = "Firefox" },
+       properties = {floating = false, tag = tags[1][1] } },
 }
 -- }}}
 

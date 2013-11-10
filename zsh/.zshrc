@@ -420,6 +420,7 @@ alias rm='rm -iv'
 alias ln='ln -v'
 alias chmod="chmod -c"
 alias chown="chown -c"
+alias viewImages="feh -g 640x480 -d -S filename"
 
 if command -v colordiff > /dev/null 2>&1; then
 	alias diff="colordiff -Nuar"
@@ -771,7 +772,8 @@ bindkey "^S" history-incremental-pattern-search-forward
 #Custom aliasses
 alias tmux='tmux -2'
 alias homessh='ssh home.k-4u.nl -p 8228'
-alias mountpathfinder='sshfs koen@home.k-4u.nl:/ -p 8228 /media/pathfinder'
+alias mountpathfinder='sshfs koen@home.k-4u.nl:/ -p 8228 /mnt/pathfinder'
+alias mountds9='sshfs pi@192.168.2.5:/ /mnt/ds9'
 alias timeUpdate='sudo ntpd -qg'
 
 if [ -f ~/.alert ]; then cat ~/.alert; fi
