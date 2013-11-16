@@ -6,8 +6,6 @@
 [format]
     pretty = "Commit:  %C(yellow)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
 
-[push]
-	default = simple
 [user]
 	name = Koen Beckers
 	email = koen@k-4u.nl
