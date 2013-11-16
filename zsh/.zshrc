@@ -364,6 +364,8 @@ elif [[ "$HOST" = "holodeck" ]]; then
 elif [[ "$HOST" = "Defiant" ]]; then
     #Cygwin windows
     hcolor='%F{cyan}'
+elif [[ "$HOST" = "enterprise" ]]; then
+    hcolor='%F{purple}'
 else
     hcolor='%F{white}'
 fi
