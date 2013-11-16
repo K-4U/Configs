@@ -774,6 +774,7 @@ alias tmux='tmux -2'
 alias homessh='ssh home.k-4u.nl -p 8228'
 alias mountpathfinder='sshfs koen@home.k-4u.nl:/ -p 8228 /mnt/pathfinder'
 alias mountds9='sshfs pi@192.168.2.5:/ /mnt/ds9'
+alias mountehd='sshfs pi@192.168.2.5:/media/K-4U\ 500\ Gig_/ /mnt/ehd'
 alias timeUpdate='sudo ntpd -qg'
 
 if [ -f ~/.alert ]; then cat ~/.alert; fi
