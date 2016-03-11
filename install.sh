@@ -102,6 +102,7 @@ gitconfig="$HOME/.gitconfig"
 
 # How are the files called in the repository
 local_dir="$( cd "$( dirname "$0" )" && pwd)"
+ohmyzsh_local="$local_dir/oh-my-zsh/tools"
 zshrc_local="$local_dir/zsh/.zshrc"
 vimrc_local="$local_dir/vim/vimrc"
 vimdir_local="$local_dir/vim/vim"
@@ -173,6 +174,7 @@ fi
 
 if [ $do_global == true ]; then
     if ! $do_remove; then
+        $ohmyzsh_local/install.sh
         do_install "$zshrc_local" "$zshrc_global" "root"
         do_install "$vimrc_local" "$vimrc_global" "root"
         do_install "$tmux_local" "$tmux_global" "root"
@@ -191,6 +193,7 @@ if [ $do_global == true ]; then
             echo "    - Xresources"
         fi
     else
+        $ohmyzsh_local/install.sh
         do_remove "$zshrc_global"
         do_remove "$vimrc_global"
         do_remove "$tmux_global"
@@ -211,6 +214,7 @@ if [ $do_global == true ]; then
     fi
 elif [ $no_global == true ]; then
     if ! $do_remove; then
+        $ohmyzsh_local/install.sh
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
         do_install "$gitconfig_local" "$gitconfig"
@@ -235,6 +239,7 @@ elif [ $no_global == true ]; then
     fi
 else
     if ! $do_remove; then
+        $ohmyzsh_local/install.sh
         do_install "$zshrc_local" "$zshrc" 
         do_install "$vimrc_local" "$vimrc"
         do_install "$vimdir_local" "$vimdir"
