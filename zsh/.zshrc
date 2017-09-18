@@ -109,7 +109,14 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git osx mvn gradle git-extras sudo vagrant drush zsh-autosuggestions)
+
+if [[ `uname` == 'Linux' ]]; then
+    plugins=(git arch mvn gradle git-extras sudo vagrant drush zsh-autosuggestions)
+    alias ls="ls --color=auto -a"
+elif [[ `uname` == 'Darwin' ]]; then
+    plugins=(git osx mvn gradle git-extras sudo vagrant drush zsh-autosuggestions)
+    alias ls="ls -GpFa"
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -145,10 +152,10 @@ export PATH="$PATH:$HOME/bin/"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias homessh="ssh k4unl@k-4u.nl"
-alias ls="ls -GpFa"
 alias cvg="cd ~/vagrant-vm"
 alias vg="vagrant"
 alias vgu="vg up"
 alias vgs="vg ssh"
 alias vgr="vg reload"
 alias vgh="vg halt"
+alias reload="source ~/.zshrc"
