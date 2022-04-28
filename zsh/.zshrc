@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 # PowerLevel9K config
@@ -65,7 +72,7 @@ export ZSH=$HOME/.oh-my-zsh
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 #ZSH_THEME="agnoster"
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -114,7 +121,7 @@ if [[ `uname` == 'Linux' ]]; then
     plugins=(git arch mvn gradle git-extras sudo vagrant drush zsh-autosuggestions)
     alias ls="ls --color=auto -a"
 elif [[ `uname` == 'Darwin' ]]; then
-    plugins=(git osx mvn gradle git-extras sudo vagrant drush zsh-autosuggestions)
+    plugins=(git macos mvn gradle git-extras sudo aws docker)
     alias ls="ls -GpFa"
 fi
 
@@ -152,10 +159,10 @@ export PATH="$PATH:$HOME/bin/"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias homessh="ssh k4unl@k-4u.nl"
-alias cvg="cd ~/vagrant-vm"
-alias vg="vagrant"
-alias vgu="vg up"
-alias vgs="vg ssh"
-alias vgr="vg reload"
-alias vgh="vg halt"
 alias reload="source ~/.zshrc"
+alias python="python3"
+alias pip="pip3"
+
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

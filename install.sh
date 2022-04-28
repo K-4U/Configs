@@ -73,6 +73,7 @@ fi
 # Where are all destinations located
 zshrc="$HOME/.zshrc"
 zshrc_global="/etc/zsh/zshrc"
+p10kzsh="$HOME/.p10k.zsh"
 
 vimrc="$HOME/.vimrc"
 vimrc_global="/etc/vimrc"
@@ -104,6 +105,7 @@ gitconfig="$HOME/.gitconfig"
 local_dir="$( cd "$( dirname "$0" )" && pwd)"
 ohmyzsh_local="$local_dir/oh-my-zsh/tools"
 zshrc_local="$local_dir/zsh/.zshrc"
+p10kzsh_local="$local_dir/zsh/.p10k.zsh"
 vimrc_local="$local_dir/vim/vimrc"
 vimdir_local="$local_dir/vim/vim"
 tmux_local="$local_dir/tmux/.tmux.conf"
@@ -148,7 +150,7 @@ if $cmd_prefix [ -e $2 ]; then
     $($cmd_prefix$cmd)
 fi
 
-cmd="ln -sT "$1" "$2""
+cmd="ln -s "$1" "$2""
 echo "$cmd_prefix$cmd"
 $($cmd_prefix$cmd)
 }
@@ -187,6 +189,7 @@ if [ $do_global == true ]; then
         echo "    - zkbd config"
         echo "    - Vimdir. This dir cannot be copied globally!"
         echo "    - Git config"
+        echo "    - p10k config"
         if ! $is_server ; then
             echo "    - compiz config"
             echo "    - xinitrc"
@@ -206,6 +209,7 @@ if [ $do_global == true ]; then
         echo "    - zkbd config"
         echo "    - Vimdir"
         echo "    - Git config"
+        echo "    - p10k config"
         if ! $is_server ; then
             echo "    - compiz config"
             echo "    - xinitrc"
@@ -215,6 +219,7 @@ if [ $do_global == true ]; then
 elif [ $no_global == true ]; then
     if ! $do_remove; then
         $ohmyzsh_local/install.sh
+        do_install "$p10kzsh_local" "$p10kzsh"
         do_install "$zkbd_local" "$zkbd"
         do_install "$vimdir_local" "$vimdir"
         do_install "$gitconfig_local" "$gitconfig"
@@ -226,6 +231,7 @@ elif [ $no_global == true ]; then
         echo ""
         echo " :: Done installing."
     else
+        do_remove "$p10kzsh"
         do_remove "$zkbd"
         do_remove "$vimdir"
         do_remove "$gitconfig"
@@ -241,6 +247,7 @@ else
     if ! $do_remove; then
         $ohmyzsh_local/install.sh
         do_install "$zshrc_local" "$zshrc" 
+        do_install "$p10kzsh_local" "$p10kzsh"
         do_install "$vimrc_local" "$vimrc"
         do_install "$vimdir_local" "$vimdir"
         do_install "$tmux_local" "$tmux" 
@@ -256,6 +263,7 @@ else
         echo " :: Done installing files to $HOME"
         echo " :: Please keep in mind that Awesomerc cannot be copied to your home dir!"
     else
+        do_remove "$p10kzsh"
         do_remove "$zshrc"
         do_remove "$vimrc"
         do_remove "$vimdir"
